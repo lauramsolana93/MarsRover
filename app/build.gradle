@@ -32,6 +32,7 @@ dependencies {
     implementation "androidx.core:core-ktx:$coreKtx"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayout"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
+    implementation "com.google.android.material:material:$material"
 
     implementation "com.google.code.gson:gson:$gson"
     implementation "org.koin:koin-android:$koinVersion"

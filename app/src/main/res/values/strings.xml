@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Mars Rover</string>
     <string name="start_button">Let\'s check where is going Rover</string>
-    <string name="get_position">Get next position of Rover</string>
-    <string name="move_button">Move Rover to next position</string>
+    <string name="get_position">Check Rover Direction</string>
+    <string name="move_button">Move Rover</string>
+    <string name="position_get">Position get it, press again to move</string>
+    <string name="reached_position">Rover has reached his position</string>
+    <string name="data_not_found">Ops!! Data not found</string>
 </resources>
