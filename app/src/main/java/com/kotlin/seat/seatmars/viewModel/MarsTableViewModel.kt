@@ -20,6 +20,7 @@ class MarsTableViewModel constructor
     lateinit var coordinates: Axis
     lateinit var actualCoor: Axis
     var saveDir: Char? = null
+    lateinit var movesList: List<String>
 
     val inputData: MutableLiveData<InputData> by lazy {
         repository.inputData
@@ -30,13 +31,13 @@ class MarsTableViewModel constructor
     }
 
     fun getNextMovements(): MovementData? {
-        var movementData: MovementData? = null
-        var dir: Char = MOVE
-        var oldDir: Char = MOVE
+        var movementData: MovementData?
+        var dir: Char
+        var oldDir: Char
         var inputData: InputData? = repository.inputData.value
 
         if (inputData != null) {
-            var movesList = inputData.movements.chunked(1)
+            movesList = inputData.movements.chunked(1)
 
             when {
                 count < movesList.size -> {
@@ -70,9 +71,6 @@ class MarsTableViewModel constructor
 
                 }
                 else -> {
-                    /*movementData = doMovements(dir, oldDir)
-                        movementData.hasToUpdateTable = false
-                        movementData.isLastMove = true*/
                     return null
                 }
             }
@@ -104,6 +102,7 @@ class MarsTableViewModel constructor
                 rotation = rotation
                 if (oldDir != LEFT && oldDir != RIGHT) {
                     coordinates = axisPossibleMoves.nextPossibleMove(NORTH)
+
                 }
                 if (coordinates.x in 1..5 && coordinates.y in 1..5) {
                     hasToUpdateTable = true
