@@ -3,4 +3,5 @@
     <string name="start_button">Let\'s check where is going Rover</string>
     <string name="get_position">Get next position of Rover</string>
     <string name="move_button">Move Rover to next position</string>
+    <string name="position_get">POSITION GET IT, PRESS AGAIN TO MOVE</string>
 </resources>

@@ -46,19 +46,39 @@ class MarsPlateauActivity : AppCompatActivity() {
             table.removeAllViews()
             vm.count = 0
             vm.getDataFromJson(this)
+            vm.rotation = 0F
         }
         move_button.setOnClickListener {
             var moves = vm.getNextMovements()
             if (moves != null) {
                 if (moves.hasToUpdateTable) {
-                    updateTable(moves.coordiantes)
+                    updateTable(moves.coordiantes, moves.rotation)
+                    if (moves.isLastMove) {
+                        move_button.visibility = GONE
+                    } else {
+                        if (moves.dir == moves.oldDir) {
+                            move_button.text = getString(R.string.move_button)
+                        } else {
+                            move_button.text = getString(R.string.get_position)
+                        }
+                    }
+
                 } else {
-                    Toast.makeText(this, "POSITION GET IT, PRESS AGAIN TO MOVE", Toast.LENGTH_SHORT)
-                        .show()
+
+                    if (moves.isLastMove) {
+                        move_button.visibility = GONE
+                    } else {
+                        rotationTable(moves.actualCoor, moves.rotation)
+                        Toast.makeText(
+                            this,
+                            getString(R.string.position_get),
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                        move_button.text = getString(R.string.move_button)
+                    }
                 }
             }
-
-
         }
 
     }
@@ -67,8 +87,7 @@ class MarsPlateauActivity : AppCompatActivity() {
         vm.inputData.subscribe(this, this::drawTable)
     }
 
-
-    private fun updateTable(coordinates: Axis) {
+    private fun rotationTable(coordinates: Axis, dirRotation: Float) {
         var inputData = vm.inputData.value
         table.removeAllViews()
         if (inputData != null) {
@@ -88,6 +107,51 @@ class MarsPlateauActivity : AppCompatActivity() {
                             )
                             background = getDrawable(R.drawable.rover)
                             scaleY = -1F
+                            rotation += dirRotation
+                        }
+                    } else {
+                        imageView.apply {
+                            layoutParams = TableRow.LayoutParams(
+                                TableRow.LayoutParams.MATCH_PARENT,
+                                TableRow.LayoutParams.MATCH_PARENT
+                            )
+                            background = getDrawable(R.drawable.mars)
+                        }
+                    }
+
+
+                    row.addView(imageView)
+                }
+                table.addView(row)
+            }
+            table.visibility = VISIBLE
+        } else {
+            //ERROR DATA NOT FOUND
+        }
+    }
+
+
+    private fun updateTable(coordinates: Axis, dirRotation: Float) {
+        var inputData = vm.inputData.value
+        table.removeAllViews()
+        if (inputData != null) {
+            for (i in 1..inputData.topRightCorner.y) {
+                row = TableRow(this)
+                row.layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                for (j in 1..inputData.topRightCorner.x) {
+                    imageView = ImageView(this)
+                    if (i == coordinates.y && j == coordinates.x) {
+                        imageView.apply {
+                            layoutParams = TableRow.LayoutParams(
+                                TableRow.LayoutParams.MATCH_PARENT,
+                                TableRow.LayoutParams.MATCH_PARENT
+                            )
+                            background = getDrawable(R.drawable.rover)
+                            scaleY = -1F
+                            rotation += dirRotation
                         }
                     } else {
                         imageView.apply {

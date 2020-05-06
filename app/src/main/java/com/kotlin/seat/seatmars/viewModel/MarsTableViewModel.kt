@@ -16,7 +16,9 @@ class MarsTableViewModel constructor
     var count = 0
     var axisPossibleMoves = AxisPossibleMoves(0, 0)
     var directionAfterRotation = 'N'
+    var rotation = 0F
     lateinit var coordinates: Axis
+    lateinit var actualCoor: Axis
     var saveDir: Char? = null
 
     val inputData: MutableLiveData<InputData> by lazy {
@@ -29,35 +31,50 @@ class MarsTableViewModel constructor
 
     fun getNextMovements(): MovementData? {
         var movementData: MovementData? = null
+        var dir: Char = MOVE
+        var oldDir: Char = MOVE
         var inputData: InputData? = repository.inputData.value
 
         if (inputData != null) {
             var movesList = inputData.movements.chunked(1)
 
-            if (count < movesList.size) {
-                var dir = movesList[count].single()
-                var oldDir = movesList[count].single()
-                if (count == 0) {
-                    directionAfterRotation = inputData.roverDirection
-                    axisPossibleMoves =
-                        AxisPossibleMoves(inputData.roverPosition.x, inputData.roverPosition.y)
-                    coordinates = axisPossibleMoves
-                    count++
-                    movementData = doMovements(dir, oldDir)
-                } else {
-                    oldDir = movesList[count - 1].single()
-                    axisPossibleMoves =
-                        AxisPossibleMoves(coordinates.x, coordinates.y)
-                    count++
-                    movementData = doMovements(dir, oldDir)
+            when {
+                count < movesList.size -> {
+                    dir = movesList[count].single()
+                    oldDir = movesList[count].single()
+                    if (count == 0) {
+                        directionAfterRotation = inputData.roverDirection
+                        axisPossibleMoves =
+                            AxisPossibleMoves(inputData.roverPosition.x, inputData.roverPosition.y)
+                        coordinates = axisPossibleMoves
+                        actualCoor = axisPossibleMoves
+                        count++
+                        movementData = doMovements(dir, oldDir)
+                    } else {
+                        oldDir = movesList[count - 1].single()
+                        axisPossibleMoves =
+                            AxisPossibleMoves(coordinates.x, coordinates.y)
+                        actualCoor = axisPossibleMoves
+
+                        movementData = doMovements(dir, oldDir)
+                        if (count == movesList.size - 1) {
+                            movementData.hasToUpdateTable = true
+                            movementData.isLastMove = true
+                        }
+                        count++
+
+                    }
+                    movementData.actualCoor = actualCoor
+                    return movementData
+
 
                 }
-
-                return movementData
-
-
-            } else {
-                return null
+                else -> {
+                    /*movementData = doMovements(dir, oldDir)
+                        movementData.hasToUpdateTable = false
+                        movementData.isLastMove = true*/
+                    return null
+                }
             }
         }
         return null
@@ -72,6 +89,7 @@ class MarsTableViewModel constructor
                 directionAfterRotation =
                     axisPossibleMoves.rotationLeft(directionAfterRotation)
                 coordinates = axisPossibleMoves.nextPossibleMove(directionAfterRotation)
+                rotation -= 90F
             }
             RIGHT -> {
                 saveDir = dir
@@ -79,9 +97,11 @@ class MarsTableViewModel constructor
                     axisPossibleMoves.rotationRight(directionAfterRotation)
                 coordinates =
                     axisPossibleMoves.nextPossibleMove(directionAfterRotation)
+                rotation += 90F
             }
             MOVE -> {
                 saveDir = dir
+                rotation = rotation
                 if (oldDir != LEFT && oldDir != RIGHT) {
                     coordinates = axisPossibleMoves.nextPossibleMove(NORTH)
                 }
@@ -90,7 +110,7 @@ class MarsTableViewModel constructor
                 }
             }
         }
-        return MovementData(coordinates, dir, oldDir, hasToUpdateTable)
+        return MovementData(coordinates, actualCoor, dir, oldDir, hasToUpdateTable, rotation, false)
     }
 
 }
