@@ -7,12 +7,14 @@ import com.kotlin.seat.seatmars.common.utils.JsonParser
 
 class MarsLocalData : MarsDataContract.Local {
 
-    val jsonParser = JsonParser()
+    var jsonParser: JsonParser = JsonParser()
+    val gson = Gson()
     lateinit var inputData: InputData
 
     override fun getDataFromJson(context: Context): InputData {
+        jsonParser = JsonParser()
         val jsonFileString = jsonParser.getJsonDataFromAssets(context, "input.json")
-        val gson = Gson()
+
         inputData = gson.fromJson(jsonFileString, InputData::class.java)
         return inputData
     }
