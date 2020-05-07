@@ -66,5 +66,6 @@ dependencies {
 }
 
 screenshots {
+    referenceDir = "$projectDir/app/build/screenshot"
     multipleDevices true
 }
