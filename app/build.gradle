@@ -48,8 +48,10 @@ dependencies {
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:$mockitoKotlin"
     testImplementation "io.mockk:mockk:$mockk"
     testImplementation "io.mockk:mockk-android:$mockk"
+    testImplementation "org.robolectric:robolectric:$roboelectric"
     androidTestImplementation "androidx.test:runner:$test"
     androidTestImplementation "com.android.support.test:rules:$test"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'com.microsoft.appcenter:espresso-test-extension:1.4'
+
 }

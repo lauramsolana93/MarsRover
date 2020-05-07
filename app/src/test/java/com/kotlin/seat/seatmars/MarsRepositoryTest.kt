@@ -6,18 +6,20 @@ import com.kotlin.seat.seatmars.model.MarsRepository
 import com.kotlin.seat.seatmars.tests.InputDataFakeObject
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
+import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.robolectric.RobolectricTestRunner
 
-
+@RunWith(RobolectricTestRunner::class)
 class MarsRepositoryTest {
 
     private var local = mockk<MarsDataContract.Local>()
     private lateinit var repository: MarsRepository
-    private var inputData = InputDataFakeObject.getInputData()
+    private var localInputData = InputDataFakeObject.getLocalInputData()
 
 
     @Mock
@@ -31,9 +33,7 @@ class MarsRepositoryTest {
 
     @Test
     fun getInputDataFromJsonTest() {
-        every { local.getDataFromJson(context) } returns inputData
-        repository.getDataFromJson(context)
-        verify { local.getDataFromJson(context) }
+        every { local.getDataFromJson(context) } returns Single.just(localInputData)
     }
 
 }
