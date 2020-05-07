@@ -1,0 +1,133 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+skip_docs
+default_platform(:android)
+
+##########
+# TESTS #
+##########
+
+def unitTestsLocal()
+    gradle(task: "testDebugUnitTest", flags: "--profile --offline", print_command_output: true)
+end
+
+def androidTests()
+    uninstallDebugAndroidTest()
+
+    begin
+      gradle(task: ":app:connectedDebugAndroidTest", print_command_output: true)
+    rescue => ex
+      UI.error("ERROR :app:connectedDebugAndroidTest - Something went wrong: #{ex}")
+    end
+
+    uninstallDebugAndroidTest()
+
+end
+
+def uninstallDebugAndroidTest()
+    begin
+      gradle(task: "uninstallDebugAndroidTest")
+    rescue => ex
+      UI.error("ERROR uninstallDebugAndroidTest - Something went wrong: #{ex}")
+    end
+end
+
+###########
+# QUALITY #
+###########
+
+def androidLint()
+    gradle(task: ":app:lintDebug")
+end
+
+def lint()
+    gradle(task: "lint")
+end
+
+
+def checkAllQualityProcesses()
+
+    begin
+        lint()
+    rescue => ex
+        UI.error("ERROR lint - Something went wrong: #{ex}")
+    end
+
+    begin
+        androidLint()
+    rescue => ex
+        UI.error("ERROR AndroidLint - Something went wrong: #{ex}")
+    end
+end
+
+########
+# OTHE #
+########
+
+desc "Clean project"
+def clean()
+    begin
+      gradle(task: "clean", print_command_output: false)
+    rescue => ex
+      UI.error("ERROR Clean project - Something went wrong: #{ex}")
+    end
+end
+
+#########
+# LANES #
+#########
+
+platform :android do
+  desc "Runs all the tests"
+  lane :test do
+   clean()
+
+           begin
+               unitTestsLocal()
+           rescue => ex
+               UI.error("ERROR Unit Tests Local - Something went wrong: #{ex}")
+           end
+
+           begin
+               androidTests()
+           rescue => ex
+               UI.error("ERROR Android Tests - Something went wrong: #{ex}")
+           end
+  end
+
+  desc "Run unit Tests"
+  lane :unitTestsLocal do
+    unitTestsLocal()
+   end
+
+   desc "Runs all android tests"
+       lane :androidTests do
+           androidTests()
+       end
+
+   desc "Check all the quality process to the project and fix if it is possible"
+      lane :quality do
+          checkAllQualityProcesses()
+      end
+
+  desc "Submit a new Beta Build to Crashlytics Beta"
+  lane :beta do
+    gradle(task: "clean assembleRelease")
+  end
+
+end
+
+
