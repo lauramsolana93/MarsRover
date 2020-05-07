@@ -65,7 +65,7 @@ class MarsPlateauActivityTest {
         reportHelper.label("MARS PLATEAU ACTIVITY ON LAST POSITION")
         onView(withId(R.id.start_button)).check(matches(isDisplayed()))
         onView(withId(R.id.start_button)).perform(click())
-        var inputData = InputDataFakeObject.getInputData()
+        var inputData = InputDataFakeObject.getLocalInputData()
         var movesList = inputData.movements.chunked(1)
 
         for (i in movesList.indices) {
