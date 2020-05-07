@@ -3,7 +3,7 @@ package com.kotlin.seat.seatmars.common.utils
 import android.content.Context
 import java.io.IOException
 
-class JsonParser {
+open class JsonParser {
 
     fun getJsonDataFromAssets(context: Context, fileName: String): String? {
         val jsonString: String
