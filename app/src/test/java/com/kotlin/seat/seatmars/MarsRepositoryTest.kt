@@ -6,6 +6,7 @@ import com.kotlin.seat.seatmars.model.MarsRepository
 import com.kotlin.seat.seatmars.tests.InputDataFakeObject
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -31,5 +32,8 @@ class MarsRepositoryTest {
     @Test
     fun getInputDataFromJsonTest() {
         every { local.getDataFromJson(context) } returns inputData
+        repository.getDataFromJson(context)
+        verify { local.getDataFromJson(context) }
     }
+
 }

@@ -7,7 +7,7 @@ import com.kotlin.seat.seatmars.common.utils.JsonParser
 
 class MarsLocalData : MarsDataContract.Local {
 
-    var jsonParser: JsonParser = JsonParser()
+    lateinit var jsonParser: JsonParser
     val gson = Gson()
     lateinit var inputData: InputData
 
