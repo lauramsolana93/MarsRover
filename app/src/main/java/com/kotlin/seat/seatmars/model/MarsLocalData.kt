@@ -2,21 +2,25 @@ package com.kotlin.seat.seatmars.model
 
 import android.content.Context
 import com.google.gson.Gson
-import com.kotlin.seat.seatmars.common.data.InputData
+import com.kotlin.seat.seatmars.common.data.local.LocalInputData
 import com.kotlin.seat.seatmars.common.utils.JsonParser
+import io.reactivex.Single
 
 class MarsLocalData : MarsDataContract.Local {
 
-    lateinit var jsonParser: JsonParser
-    val gson = Gson()
-    lateinit var inputData: InputData
+    private lateinit var jsonParser: JsonParser
+    private val gson = Gson()
+    lateinit var localInputData: Single<LocalInputData>
 
-    override fun getDataFromJson(context: Context): InputData {
+    override fun getDataFromJson(context: Context): Single<LocalInputData> {
         jsonParser = JsonParser()
         val jsonFileString = jsonParser.getJsonDataFromAssets(context, "input.json")
 
-        inputData = gson.fromJson(jsonFileString, InputData::class.java)
-        return inputData
+        return localInputData.map {
+            gson.fromJson(jsonFileString, LocalInputData::class.java)
+        }
+
+
     }
 
 }
