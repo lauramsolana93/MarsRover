@@ -1,5 +1,7 @@
 package com.kotlin.seat.seatmars
 
+import android.view.LayoutInflater
+import android.view.View
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -8,6 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.rule.ActivityTestRule
+import com.facebook.testing.screenshot.Screenshot
 import com.kotlin.seat.seatmars.tests.InputDataFakeObject
 import com.kotlin.seat.seatmars.ui.activity.MarsPlateauActivity
 import com.microsoft.appcenter.espresso.Factory
@@ -19,6 +22,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class MarsPlateauActivityTest {
+
+    lateinit var mLayoutInflater: LayoutInflater
+    lateinit var view: View
 
 
     @Rule
@@ -33,6 +39,9 @@ class MarsPlateauActivityTest {
     @Before
     fun init() {
         mActivityTestRule.activity
+        /*mLayoutInflater = LayoutInflater.from(mActivityTestRule.activity)
+        view = mLayoutInflater.inflate(R.layout.activity_main, null, false)
+        ViewHelpers.setupView(view).setExactWidthDp(360).layout()*/
 
     }
 
@@ -40,6 +49,7 @@ class MarsPlateauActivityTest {
     fun checkViewOnEnter() {
         reportHelper.label("MARS PLATEAU ACTIVITY ON ENTER")
         onView(withId(R.id.start_button)).check(matches(isDisplayed()))
+        Screenshot.snap(view).record()
     }
 
     @Test
@@ -48,6 +58,7 @@ class MarsPlateauActivityTest {
         onView(withId(R.id.start_button)).perform(click())
         onView(withId(R.id.table_plateau)).check(matches(isDisplayed()))
         onView(withId(R.id.move_button)).check(matches(isDisplayed()))
+        Screenshot.snap(view).record()
     }
 
     @Test
@@ -58,6 +69,7 @@ class MarsPlateauActivityTest {
         onView(withId(R.id.move_button)).check(matches(isDisplayed()))
         onView(withId(R.id.move_button)).perform(click())
         onView(withId(R.id.table_plateau)).check(matches(isDisplayed()))
+        Screenshot.snap(view).record()
     }
 
     @Test
@@ -77,7 +89,8 @@ class MarsPlateauActivityTest {
                 onView(withId(R.id.message)).check(matches(isDisplayed()))
             }
         }
-    }
 
+        Screenshot.snap(view).record()
+    }
 
 }
