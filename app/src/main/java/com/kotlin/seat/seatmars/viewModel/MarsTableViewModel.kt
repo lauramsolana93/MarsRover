@@ -34,7 +34,7 @@ class MarsTableViewModel constructor
         var movementData: MovementData?
         var dir: Char
         var oldDir: Char
-        var inputData: InputData? = repository.inputData.value
+        val inputData: InputData? = repository.inputData.value
 
         if (inputData != null) {
             movesList = inputData.movements.chunked(1)

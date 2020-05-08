@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.kotlin.seat.seatmars.R
 import com.kotlin.seat.seatmars.common.data.Axis
 import com.kotlin.seat.seatmars.common.data.InputData
+import com.kotlin.seat.seatmars.common.data.MovementData
 import com.kotlin.seat.seatmars.common.utils.*
 import com.kotlin.seat.seatmars.di.injectModule
 import com.kotlin.seat.seatmars.ui.fragment.BottomSheet
@@ -26,7 +27,6 @@ class MarsPlateauActivity : AppCompatActivity() {
     private lateinit var table: TableLayout
     private lateinit var imageView: ImageView
     private lateinit var row: TableRow
-    var saveDir: Char? = null
     private lateinit var bottomSheet: BottomSheet
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +34,7 @@ class MarsPlateauActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         injectModule()
         initViews()
+        setListeners()
         setUpObservers()
     }
 
@@ -42,55 +43,116 @@ class MarsPlateauActivity : AppCompatActivity() {
         table.visibility = GONE
         table.scaleY = -1F
         table.scaleX = -1F
+        bottomSheet = BottomSheet.newInstance()
+    }
+
+    private fun setListeners() {
         start_button.setOnClickListener {
             table.removeAllViews()
             vm.count = 0
             vm.getDataFromJson(this)
             vm.rotation = 0F
         }
-        bottomSheet = BottomSheet.newInstance()
         move_button.setOnClickListener {
             var moves = vm.getNextMovements()
-            if (moves != null) {
-                if (moves.hasToUpdateTable) {
-                    updateTable(moves.coordiantes, moves.rotation)
-                    if (moves.isLastMove) {
-                        bottomSheet.show(
-                            supportFragmentManager,
-                            "LAST MOVE",
-                            getString(R.string.reached_position) + getFinalPosition(
-                                moves.coordiantes,
-                                moves.dir,
-                                moves.oldDir
-                            )
-                        )
-                        move_button.visibility = GONE
+            hasToUpdateTable(moves)
 
-                    }
-
-                } else {
-
-                    if (moves.isLastMove) {
-                        move_button.visibility = GONE
-                    } else {
-                        rotationTable(moves.actualCoor, moves.rotation)
-                    }
-                }
+        }
+        bottomSheet.isClosed = {
+            if (it) {
+                start_button.visibility = VISIBLE
+                table_plateau.removeAllViews()
             }
+
+        }
+    }
+
+
+    private fun setUpObservers() {
+        vm.inputData.subscribe(this, this::drawTable)
+    }
+
+    private fun drawTable(inputData: InputData) {
+        if (inputData != null) {
+            start_button.visibility = GONE
+            if (inputData.topRightCorner.x == 0 && inputData.topRightCorner.y == 0) {
+                bottomSheet.show(
+                    supportFragmentManager,
+                    DATA_NOT_FOUND,
+                    getString(R.string.data_not_found)
+                )
+            } else {
+                for (i in 1..inputData.topRightCorner.y) {
+                    row = TableRow(this)
+                    row.layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                    for (j in 1..inputData.topRightCorner.x) {
+                        imageView = ImageView(this)
+                        if (i == inputData.roverPosition.y && j == inputData.roverPosition.x) {
+                            imageView.apply {
+                                layoutParams = TableRow.LayoutParams(
+                                    TableRow.LayoutParams.WRAP_CONTENT,
+                                    TableRow.LayoutParams.WRAP_CONTENT
+                                )
+                                background = getDrawable(R.drawable.rover)
+                                scaleY = -1F
+                            }
+                        } else {
+                            imageView.apply {
+                                layoutParams = TableRow.LayoutParams(
+                                    TableRow.LayoutParams.WRAP_CONTENT,
+                                    TableRow.LayoutParams.WRAP_CONTENT
+                                )
+                                background = getDrawable(R.drawable.mars)
+                            }
+                        }
+
+                        row.addView(imageView)
+                    }
+                    table.addView(row)
+                }
+                table.visibility = VISIBLE
+                move_button.visibility = VISIBLE
+            }
+
+        } else {
+            bottomSheet.show(
+                supportFragmentManager,
+                DATA_NOT_FOUND,
+                getString(R.string.data_not_found)
+            )
         }
 
     }
 
-    private fun getFinalPosition(coordinates: Axis, dir: Char, oldDir: Char): String =
-        if (dir == MOVE && oldDir != LEFT && oldDir != RIGHT) {
-            " ${coordinates.x} ${coordinates.y} $NORTH "
-        } else {
-            " ${coordinates.x} ${coordinates.y} $dir "
-        }
-    
+    private fun hasToUpdateTable(moves: MovementData?) {
+        if (moves != null) {
+            if (moves.hasToUpdateTable) {
+                updateTable(moves.coordiantes, moves.rotation)
+                if (moves.isLastMove) {
+                    bottomSheet.show(
+                        supportFragmentManager,
+                        LAST_MOVE,
+                        getString(R.string.reached_position) + getFinalPosition(
+                            moves.coordiantes,
+                            moves.dir,
+                            moves.oldDir
+                        )
+                    )
+                    move_button.visibility = GONE
+                }
 
-    private fun setUpObservers() {
-        vm.inputData.subscribe(this, this::drawTable)
+            } else {
+
+                if (moves.isLastMove) {
+                    move_button.visibility = GONE
+                } else {
+                    rotationTable(moves.actualCoor, moves.rotation)
+                }
+            }
+        }
     }
 
     private fun rotationTable(coordinates: Axis, dirRotation: Float) {
@@ -134,7 +196,7 @@ class MarsPlateauActivity : AppCompatActivity() {
         } else {
             bottomSheet.show(
                 supportFragmentManager,
-                "DATA NOT FOUND",
+                DATA_NOT_FOUND,
                 getString(R.string.data_not_found)
             )
         }
@@ -182,58 +244,19 @@ class MarsPlateauActivity : AppCompatActivity() {
         } else {
             bottomSheet.show(
                 supportFragmentManager,
-                "DATA NOT FOUND",
+                DATA_NOT_FOUND,
                 getString(R.string.data_not_found)
             )
         }
 
     }
 
-
-    private fun drawTable(inputData: InputData) {
-        if (inputData != null) {
-            for (i in 1..inputData.topRightCorner.y) {
-                row = TableRow(this)
-                row.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                for (j in 1..inputData.topRightCorner.x) {
-                    imageView = ImageView(this)
-                    if (i == inputData.roverPosition.y && j == inputData.roverPosition.x) {
-                        imageView.apply {
-                            layoutParams = TableRow.LayoutParams(
-                                TableRow.LayoutParams.WRAP_CONTENT,
-                                TableRow.LayoutParams.WRAP_CONTENT
-                            )
-                            background = getDrawable(R.drawable.rover)
-                            scaleY = -1F
-                        }
-                    } else {
-                        imageView.apply {
-                            layoutParams = TableRow.LayoutParams(
-                                TableRow.LayoutParams.WRAP_CONTENT,
-                                TableRow.LayoutParams.WRAP_CONTENT
-                            )
-                            background = getDrawable(R.drawable.mars)
-                        }
-                    }
-
-                    row.addView(imageView)
-                }
-                table.addView(row)
-            }
-            table.visibility = VISIBLE
-            move_button.visibility = VISIBLE
+    private fun getFinalPosition(coordinates: Axis, dir: Char, oldDir: Char): String =
+        if (dir == MOVE && oldDir != LEFT && oldDir != RIGHT) {
+            " ${coordinates.x} ${coordinates.y} $NORTH "
         } else {
-            bottomSheet.show(
-                supportFragmentManager,
-                "DATA NOT FOUND",
-                getString(R.string.data_not_found)
-            )
+            " ${coordinates.x} ${coordinates.y} $dir "
         }
-
-    }
 
 
 }
