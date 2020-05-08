@@ -7,3 +7,6 @@ const val EAST = 'E'
 const val LEFT = 'L'
 const val RIGHT = 'R'
 const val MOVE = 'M'
+
+const val LAST_MOVE="LAST MOVE"
+const val DATA_NOT_FOUND = "DATA NOT FOUND"

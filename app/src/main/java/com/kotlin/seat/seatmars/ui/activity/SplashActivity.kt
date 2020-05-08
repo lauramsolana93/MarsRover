@@ -25,5 +25,6 @@ class SplashActivity : AppCompatActivity() {
         delay(2000)
         var intent = Intent(this, MarsPlateauActivity::class.java)
         startActivity(intent)
+        finish()
     }
 }

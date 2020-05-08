@@ -1,5 +1,6 @@
 package com.kotlin.seat.seatmars.ui.fragment
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ class BottomSheet : BottomSheetDialogFragment() {
     private lateinit var imageView: ImageView
     private lateinit var close: ImageView
     private var messageText = ""
+    var isClosed: ((Boolean) -> Unit)? = null
 
     companion object {
         fun newInstance() : BottomSheet {
@@ -59,5 +61,10 @@ class BottomSheet : BottomSheetDialogFragment() {
     fun show(manager: FragmentManager, tag: String, message: String) {
         super.show(manager, tag)
         this.messageText = message
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        isClosed?.invoke(true)
     }
 }
