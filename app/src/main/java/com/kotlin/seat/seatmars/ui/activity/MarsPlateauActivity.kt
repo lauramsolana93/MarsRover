@@ -60,7 +60,7 @@ class MarsPlateauActivity : AppCompatActivity() {
         }
         bottomSheet.isClosed = {
             if (it) {
-                start_button.visibility = VISIBLE
+                start_button.text = getString(R.string.start_button)
                 table_plateau.removeAllViews()
             }
 
@@ -74,7 +74,7 @@ class MarsPlateauActivity : AppCompatActivity() {
 
     private fun drawTable(inputData: InputData) {
         if (inputData != null) {
-            start_button.visibility = GONE
+            start_button.text = getString(R.string.restart_plateau)
             if (inputData.topRightCorner.x == 0 && inputData.topRightCorner.y == 0) {
                 bottomSheet.show(
                     supportFragmentManager,
