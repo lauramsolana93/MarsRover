@@ -28,7 +28,7 @@ class MarsPlateauActivityTest {
     lateinit var mLayoutInflater: LayoutInflater
     lateinit var view: View
 
-    val context: Context by lazy {
+    private val context: Context by lazy {
         InstrumentationRegistry.getInstrumentation().targetContext
     }
 
