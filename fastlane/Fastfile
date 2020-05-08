@@ -123,9 +123,9 @@ platform :android do
           checkAllQualityProcesses()
       end
 
-  desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
-    gradle(task: "clean assembleRelease")
+  desc "Assemble Debug"
+  lane :assembleDebug do
+    gradle(task: "clean assembleDebug")
   end
 
 end
